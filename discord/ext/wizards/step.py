@@ -38,6 +38,9 @@ class Step:
         message = await wizard._ctx.bot.wait_for(
             "message", check=wizard._check_message
         )
+        if message.content in wizard._actions:
+            action = wizard._actions[message.content]
+            return await action(message)
         return await self.action(wizard, self, message)
 
 

@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 import discord
 from discord.ext.commands import Context
 from discord.ext.wizards.step import MISSING, Step
+from discord.ext.wizards.action import ACTION
 
 
 class Wizard:
@@ -10,6 +11,7 @@ class Wizard:
         self._ctx: Optional[Context] = None
         self._running = True
         self._steps: List[Step] = []
+        self._actions: Dict[str, ACTION] = {}
         self._to_cleanup: List[int] = []
 
         self.cleanup_after = cleanup_after
@@ -19,6 +21,15 @@ class Wizard:
             attr = self.__getattribute__(attr_name)
             if isinstance(attr, Step):
                 self._steps.append(attr)
+            else:
+                try:
+                    names = attr.__action_triggers__
+                except AttributeError:
+                    pass
+                else:
+                    for n in names:
+                        self._actions[n] = attr
+
         self._steps.sort(key=lambda s: s.index)
 
     @property
