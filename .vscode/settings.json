@@ -1,5 +1,0 @@
-{
-    "python.pythonPath": "/opt/anaconda3/envs/wizards/bin/python",
-    "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
-}
