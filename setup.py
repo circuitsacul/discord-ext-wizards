@@ -3,6 +3,7 @@ from discord.ext.wizards import __version__
 
 
 setup(
+    name="discord-ext-wizards",
     author="Circuit",
     url="https://github.com/CircuitsBots/discord-ext-wizards",
     version=__version__,
