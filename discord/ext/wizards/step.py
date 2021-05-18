@@ -31,9 +31,9 @@ class Step:
 
     async def do_step(self, wizard: "Wizard") -> Any:
         try:
-            await self._do_step(wizard)
+            return await self._do_step(wizard)
         except Exception as e:
-            await wizard.on_step_error(self, e)
+            return await wizard.on_step_error(self, e)
 
     async def _do_step(self, wizard: "Wizard") -> Any:
         if isinstance(self.description, str):
