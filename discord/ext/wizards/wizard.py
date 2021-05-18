@@ -86,10 +86,7 @@ class Wizard:
             if not step.call_internally:
                 continue
 
-            try:
-                await step.do_step(self)
-            except Exception as e:
-                await self.on_step_error(step, e)
+            await step.do_step(self)
         self._running = False
 
     def _check_message(self, message: discord.Message) -> bool:

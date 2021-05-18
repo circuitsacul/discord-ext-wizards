@@ -30,6 +30,12 @@ class Step:
         self.result = MISSING
 
     async def do_step(self, wizard: "Wizard") -> Any:
+        try:
+            await self._do_step(wizard)
+        except Exception as e:
+            await wizard.on_step_error(self, e)
+
+    async def _do_step(self, wizard: "Wizard") -> Any:
         if isinstance(self.description, str):
             desc = self.description
         else:
@@ -42,11 +48,9 @@ class Step:
         if message.content in wizard._actions:
             action = wizard._actions[message.content]
             try:
-                await action(message)
+                return await action(message)
             except Exception as e:
                 return await wizard.on_action_error(action, e)
-            else:
-                return await self.do_step(wizard)
         return await self.action(wizard, self, message)
 
 
