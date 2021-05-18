@@ -41,7 +41,12 @@ class Step:
         wizard._to_cleanup.append(message.id)
         if message.content in wizard._actions:
             action = wizard._actions[message.content]
-            return await action(message)
+            try:
+                await action(message)
+            except Exception as e:
+                return await wizard.on_action_error(action, e)
+            else:
+                return await self.do_step(wizard)
         return await self.action(wizard, self, message)
 
 

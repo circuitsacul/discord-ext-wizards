@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional
+import traceback
 
 import discord
 from discord.ext.commands import Context
@@ -61,6 +62,14 @@ class Wizard:
         self._to_cleanup.append(m.id)
         return m
 
+    async def on_step_error(self, step: "Step", err: Exception):
+        traceback.print_exception(err.__class__, err, err.__traceback__)
+        await self.stop(True)
+
+    async def on_action_error(self, action: ACTION, err: Exception):
+        traceback.print_exception(err.__class__, err, err.__traceback__)
+        await self.stop(True)
+
     @property
     def result(self) -> Dict[str, Any]:
         dct: Dict[str, Any] = {}
@@ -77,7 +86,10 @@ class Wizard:
             if not step.call_internally:
                 continue
 
-            await step.do_step(self)
+            try:
+                await step.do_step(self)
+            except Exception as e:
+                await self.on_step_error(step, e)
         self._running = False
 
     def _check_message(self, message: discord.Message) -> bool:
