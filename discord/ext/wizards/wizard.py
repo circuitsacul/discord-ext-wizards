@@ -32,19 +32,6 @@ class Wizard:
 
         self._steps.sort(key=lambda s: s.index)
 
-    @property
-    def result(self) -> Dict[str, Any]:
-        dct: Dict[str, Any] = {}
-        for step in self._steps:
-            if step.result is not MISSING:
-                dct[step.name] = step.result
-        return dct
-
-    async def send(self, *args, **kwargs) -> discord.Message:
-        m = await self._ctx.send(*args, **kwargs)
-        self._to_cleanup.append(m.id)
-        return m
-
     async def start(self, ctx: Context) -> Dict[str, Any]:
         self._ctx = ctx
         await self._internal_loop()
@@ -68,6 +55,19 @@ class Wizard:
                     await mobj.delete()
                 except (discord.NotFound, discord.Forbidden):
                     pass
+
+    async def send(self, *args, **kwargs) -> discord.Message:
+        m = await self._ctx.send(*args, **kwargs)
+        self._to_cleanup.append(m.id)
+        return m
+
+    @property
+    def result(self) -> Dict[str, Any]:
+        dct: Dict[str, Any] = {}
+        for step in self._steps:
+            if step.result is not MISSING:
+                dct[step.name] = step.result
+        return dct
 
     async def _internal_loop(self):
         current_step = 0
