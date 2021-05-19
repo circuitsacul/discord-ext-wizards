@@ -44,7 +44,7 @@ class Wizard:
         return self.result
 
     async def stop(self, reason: Optional[StopReason] = None):
-        self.reason = reason
+        self.stop_reason = reason
         self._running = False
 
     async def cleanup(self):
