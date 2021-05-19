@@ -1,8 +1,7 @@
-import discord
-from typing import Awaitable, Callable, List
+from typing import Callable, List
 
 
-ACTION = Callable[[discord.Message], Awaitable[None]]
+from discord.ext.wizards.constants import ACTION
 
 
 def action(*names: List[str]) -> Callable[[ACTION], ACTION]:

@@ -1,16 +1,13 @@
+import asyncio
 from typing import Callable, Awaitable, Any, Optional, TYPE_CHECKING, Union
 
 import discord
 
+from discord.ext.wizards.constants import MISSING
+from discord.ext.wizards.stopreason import StopReason
+
 if TYPE_CHECKING:
     from discord.ext.wizards.wizard import Wizard
-
-
-class SpecialTypeClass:
-    pass
-
-
-MISSING = SpecialTypeClass()
 
 
 class Step:
@@ -21,12 +18,14 @@ class Step:
         name: str,
         call_internally: bool,
         description: Union[Callable[["Step"], str], str],
+        timeout: Optional[float] = None,
     ):
         self.index = index
         self.action = action
         self.name = name
         self.description = description
         self.call_internally = call_internally
+        self.timeout = timeout
         self.result = MISSING
 
     async def do_step(self, wizard: "Wizard") -> Any:
@@ -41,9 +40,14 @@ class Step:
         else:
             desc = self.description(wizard, self)
         await wizard.send(desc)
-        message = await wizard._ctx.bot.wait_for(
-            "message", check=wizard._check_message
-        )
+        try:
+            message = await wizard._ctx.bot.wait_for(
+                "message",
+                check=wizard._check_message,
+                timeout=self.timeout or wizard.timeout
+            )
+        except asyncio.TimeoutError:
+            return await wizard.stop(StopReason.TIMED_OUT)
         wizard._to_cleanup.append(message.id)
         if message.content in wizard._actions:
             action = wizard._actions[message.content]
@@ -59,6 +63,7 @@ def step(
     name: Optional[str] = None,
     call_internally: bool = True,
     position: int = None,
+    timeout: Optional[float] = None,
 ):
     def predicate(
         action: Callable[["Step", discord.Message], Awaitable[Any]]
@@ -69,5 +74,6 @@ def step(
             name or action.__name__,
             call_internally,
             description,
+            timeout,
         )
     return predicate

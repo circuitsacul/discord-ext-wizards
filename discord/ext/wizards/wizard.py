@@ -3,20 +3,23 @@ import traceback
 
 import discord
 from discord.ext.commands import Context
-from discord.ext.wizards.step import MISSING, Step
-from discord.ext.wizards.action import ACTION
+
+from discord.ext.wizards.constants import MISSING, ACTION
+from discord.ext.wizards.step import Step
+from discord.ext.wizards.stopreason import StopReason
 
 
 class Wizard:
-    def __init__(self, cleanup_after: bool = True):
+    def __init__(self, cleanup_after: bool = True, timeout: float = 180.0):
         self._ctx: Optional[Context] = None
         self._running = True
-        self._steps: List[Step] = []
-        self._actions: Dict[str, ACTION] = {}
+        self._steps: List["Step"] = []
+        self._actions: Dict[str, "ACTION"] = {}
         self._to_cleanup: List[int] = []
 
+        self.timeout = timeout
         self.cleanup_after = cleanup_after
-        self.cancelled: bool = False
+        self.stop_reason: Optional[StopReason] = None
 
         for attr_name in dir(self):
             attr = self.__getattribute__(attr_name)
@@ -40,8 +43,8 @@ class Wizard:
             await self.cleanup()
         return self.result
 
-    async def stop(self, cancelled: bool = False):
-        self.cancelled = cancelled
+    async def stop(self, reason: Optional[StopReason] = None):
+        self.reason = reason
         self._running = False
 
     async def cleanup(self):
@@ -64,11 +67,11 @@ class Wizard:
 
     async def on_step_error(self, step: "Step", err: Exception):
         traceback.print_exception(err.__class__, err, err.__traceback__)
-        await self.stop(True)
+        await self.stop(StopReason.ERROR)
 
-    async def on_action_error(self, action: ACTION, err: Exception):
+    async def on_action_error(self, action: "ACTION", err: Exception):
         traceback.print_exception(err.__class__, err, err.__traceback__)
-        await self.stop(True)
+        await self.stop(StopReason.ERROR)
 
     @property
     def result(self) -> Dict[str, Any]:
