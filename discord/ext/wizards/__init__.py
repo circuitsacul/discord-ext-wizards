@@ -5,7 +5,7 @@ from .stopreason import StopReason
 from .constants import MISSING
 
 
-__version__ = "0.1.0a"
+__version__ = "0.1.1a"
 
 __all__ = [
     "Step",
