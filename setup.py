@@ -1,6 +1,10 @@
+import pathlib
 from setuptools import setup
 
 from discord.ext.wizards import __version__
+
+HERE = pathlib.Path(__file__).parent
+README = (HERE / "README.md").read_text()
 
 setup(
     name="discord-ext-wizards",
@@ -10,6 +14,7 @@ setup(
     packages=["discord.ext.wizards"],
     license="MIT",
     description="A module for making setup wizards easily.",
+    long_description=README,
     install_request=["discord.py>=1.2.5"],
     python_requires=">=3.5.3",
 )
