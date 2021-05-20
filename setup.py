@@ -5,7 +5,6 @@ from discord.ext.wizards import __version__
 
 HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
-print(type(README))
 
 setup(
     name="discord-ext-wizards",
