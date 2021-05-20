@@ -1,5 +1,5 @@
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, Optional, Union
+from typing import Awaitable, TYPE_CHECKING, Any, Callable, Optional, Union
 
 from discord.ext.wizards.stopreason import StopReason
 from discord.ext.wizards.constants import STEP
@@ -17,6 +17,8 @@ class Step:
         call_internally: bool,
         description: Union[Callable[["Wizard"], str], str],
         timeout: Optional[float] = None,
+        skip_if: Optional[Callable[["Wizard"], Union[Awaitable[bool], bool]]]
+        = None,
     ):
         self.index = index
         self.action = action
@@ -24,8 +26,17 @@ class Step:
         self.description = description
         self.call_internally = call_internally
         self.timeout = timeout
+        self.skip_if = skip_if
 
     async def do_step(self, wizard: "Wizard") -> Any:
+        if self.skip_if is not None:
+            if asyncio.iscoroutinefunction(self.skip_if):
+                skip = await self.skip_if(wizard)
+            else:
+                skip = self.skip_if(wizard)
+            if skip:
+                return
+
         try:
             return await self._do_step(wizard)
         except Exception as e:
@@ -61,6 +72,8 @@ def step(
     call_internally: bool = True,
     position: int = None,
     timeout: Optional[float] = None,
+    skip_if: Optional[Callable[["Wizard"], Union[Awaitable[bool], bool]]]
+    = None,
 ) -> Callable[[STEP], Step]:
     def predicate(
         action: STEP,
@@ -72,6 +85,7 @@ def step(
             call_internally,
             description,
             timeout,
+            skip_if,
         )
 
     return predicate
