@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from discord.ext.commands import Context
 
 import discord
-from discord.ext.wizards.constants import ACTION, MISSING
+from discord.ext.wizards.constants import ACTION
 from discord.ext.wizards.step import Step
 from discord.ext.wizards.stopreason import StopReason
 
@@ -41,7 +41,6 @@ class Wizard:
         await self._internal_loop()
         if self.cleanup_after:
             await self.cleanup()
-        return self.result
 
     async def stop(self, reason: Optional[StopReason] = None):
         self.stop_reason = reason
@@ -66,6 +65,9 @@ class Wizard:
         self._to_cleanup.append(m.id)
         return m
 
+    async def do_step(self, step: "Step") -> Any:
+        return await step.do_step(self)
+
     async def on_step_error(self, step: "Step", err: Exception):
         traceback.print_exception(err.__class__, err, err.__traceback__)
         await self.stop(StopReason.ERROR)
@@ -73,14 +75,6 @@ class Wizard:
     async def on_action_error(self, action: "ACTION", err: Exception):
         traceback.print_exception(err.__class__, err, err.__traceback__)
         await self.stop(StopReason.ERROR)
-
-    @property
-    def result(self) -> Dict[str, Any]:
-        dct: Dict[str, Any] = {}
-        for step in self._steps:
-            if step.result is not MISSING:
-                dct[step.name] = step.result
-        return dct
 
     async def _internal_loop(self):
         current_step = 0

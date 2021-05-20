@@ -1,11 +1,7 @@
-from typing import Awaitable, Callable
+from typing import Any, Awaitable, Callable
 
 import discord
 
 
-class SpecialTypeClass:
-    pass
-
-
-MISSING = SpecialTypeClass()
 ACTION = Callable[[discord.Message], Awaitable[None]]
+STEP = Callable[[discord.Message], Awaitable[Any]]

@@ -1,9 +1,8 @@
 import asyncio
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional, Union
 
-import discord
-from discord.ext.wizards.constants import MISSING
 from discord.ext.wizards.stopreason import StopReason
+from discord.ext.wizards.constants import STEP
 
 if TYPE_CHECKING:
     from discord.ext.wizards.wizard import Wizard
@@ -13,10 +12,10 @@ class Step:
     def __init__(
         self,
         index: int,
-        action: Callable[["Step", discord.Message], Awaitable[Any]],
+        action: STEP,
         name: str,
         call_internally: bool,
-        description: Union[Callable[["Step"], str], str],
+        description: Union[Callable[["Wizard"], str], str],
         timeout: Optional[float] = None,
     ):
         self.index = index
@@ -25,7 +24,6 @@ class Step:
         self.description = description
         self.call_internally = call_internally
         self.timeout = timeout
-        self.result = MISSING
 
     async def do_step(self, wizard: "Wizard") -> Any:
         try:
@@ -37,7 +35,7 @@ class Step:
         if isinstance(self.description, str):
             desc = self.description
         else:
-            desc = self.description(wizard, self)
+            desc = self.description(wizard)
         await wizard.send(desc)
         try:
             message = await wizard._ctx.bot.wait_for(
@@ -54,18 +52,18 @@ class Step:
                 return await action(message)
             except Exception as e:
                 return await wizard.on_action_error(action, e)
-        return await self.action(wizard, self, message)
+        return await self.action(wizard, message)
 
 
 def step(
-    description: Union[str, Callable[[Step], str]],
+    description: Union[str, Callable[["Wizard"], str]],
     name: Optional[str] = None,
     call_internally: bool = True,
     position: int = None,
     timeout: Optional[float] = None,
-):
+) -> Callable[[STEP], Step]:
     def predicate(
-        action: Callable[["Step", discord.Message], Awaitable[Any]]
+        action: STEP,
     ) -> Step:
         return Step(
             position if position is not None else -1,
