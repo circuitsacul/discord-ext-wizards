@@ -1,8 +1,7 @@
 import asyncio
-from typing import Callable, Awaitable, Any, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Optional, Union
 
 import discord
-
 from discord.ext.wizards.constants import MISSING
 from discord.ext.wizards.stopreason import StopReason
 
@@ -44,7 +43,7 @@ class Step:
             message = await wizard._ctx.bot.wait_for(
                 "message",
                 check=wizard._check_message,
-                timeout=self.timeout or wizard.timeout
+                timeout=self.timeout or wizard.timeout,
             )
         except asyncio.TimeoutError:
             return await wizard.stop(StopReason.TIMED_OUT)
@@ -76,4 +75,5 @@ def step(
             description,
             timeout,
         )
+
     return predicate

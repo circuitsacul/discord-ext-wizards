@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Optional
 import traceback
+from typing import Any, Dict, List, Optional
 
-import discord
 from discord.ext.commands import Context
 
-from discord.ext.wizards.constants import MISSING, ACTION
+import discord
+from discord.ext.wizards.constants import ACTION, MISSING
 from discord.ext.wizards.step import Step
 from discord.ext.wizards.stopreason import StopReason
 
@@ -50,6 +50,7 @@ class Wizard:
     async def cleanup(self):
         def check(m: discord.Message) -> bool:
             return m.id in self._to_cleanup
+
         try:
             await self._ctx.channel.purge(limit=200, check=check)
         except discord.Forbidden:

@@ -1,6 +1,6 @@
 from setuptools import setup
-from discord.ext.wizards import __version__
 
+from discord.ext.wizards import __version__
 
 setup(
     name="discord-ext-wizards",

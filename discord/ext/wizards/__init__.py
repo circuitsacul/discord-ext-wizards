@@ -1,9 +1,8 @@
-from .step import Step, step
-from .wizard import Wizard
 from .action import action
-from .stopreason import StopReason
 from .constants import MISSING
-
+from .step import Step, step
+from .stopreason import StopReason
+from .wizard import Wizard
 
 __version__ = "0.1.1a"
 
