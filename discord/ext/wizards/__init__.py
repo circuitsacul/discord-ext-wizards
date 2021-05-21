@@ -3,7 +3,7 @@ from .step import Step, step
 from .stopreason import StopReason
 from .wizard import Wizard
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 
 __all__ = [
     "Step",
