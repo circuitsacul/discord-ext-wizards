@@ -1,6 +1,9 @@
 # discord-ext-wizards
 A module for creating setup wizards easily.
 
+## Instalation:
+Run `pip install --upgrade discord-ext-wizards` to install.
+
 ## Example Usage
 Below is an example usage of discord-ext-wizards to create an interactive embed builder.
 ```python
