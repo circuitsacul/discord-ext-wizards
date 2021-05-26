@@ -1,6 +1,8 @@
 # discord-ext-wizards
 A module for creating setup wizards easily.
 
+For support, please join https://discord.gg/dGAzZDaTS9.
+
 ## Instalation:
 Run `pip install --upgrade discord-ext-wizards` to install.
 
